@@ -1,79 +1,86 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useEntryForm } from '../hooks/useEntryForm'
+import FormInput from './FormInput'
 
 export default function NewEntryForm({ onAdd }) {
-    const [title, setTitle] = useState('')
-    const [date, setDate] = useState('')
-    const [emotion, setEmotion] = useState('')
-    const [content, setContent] = useState('')
     const navigate = useNavigate()
-
-    const handleSubmit = () => {
-        onAdd({ title, date, emotion, content })
+    const { formData, errors, handleChange, handleSubmit } = useEntryForm((data) => {
+        onAdd(data)
         navigate('/')
-    }
+    })
 
     return (
-        <div className="flex justify-center mt-6 mb-10">
-            <div className="w-full max-w-lg bg-white p-6 rounded-2xl shadow-lg">
-                <div className="flex items-center mb-6">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="text-gray-500 hover:text-gray-700 transition mr-2"
-                    >
-                        ←
-                    </button>
-                    <h1 className="text-2xl font-semibold text-gray-800">새 기록 작성</h1>
-                </div>
-                <form className="flex flex-col gap-5">
-                    <div>
-                        <label className="block text-gray-600 mb-1">제목</label>
-                            <input
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                                placeholder="제목을 입력하세요"
-                                value={title}
-                                onChange={e => setTitle(e.target.value)}
-                            />
+        <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-xl shadow-soft overflow-hidden">
+                <div className="p-6">
+                    <div className="flex items-center mb-6">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="text-gray-400 hover:text-gray-600 transition-colors duration-200 mr-3"
+                            aria-label="뒤로 가기"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                        </button>
+                        <h1 className="text-2xl font-semibold text-gray-900">새 기록 작성</h1>
                     </div>
+                    
+                    <form className="space-y-6" onSubmit={(e) => {
+                        e.preventDefault()
+                        handleSubmit()
+                    }}>
+                        <FormInput
+                            label="제목"
+                            type="text"
+                            name="title"
+                            value={formData.title}
+                            onChange={(e) => handleChange('title', e.target.value)}
+                            placeholder="제목을 입력하세요"
+                            error={errors.title}
+                        />
 
-                    <div>
-                        <label className="block text-gray-600 mb-1">날짜</label>
-                            <input
-                                type="date"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                                value={date}
-                                onChange={e => setDate(e.target.value)}
-                            />
-                    </div>
+                        <FormInput
+                            label="날짜"
+                            type="date"
+                            name="date"
+                            value={formData.date}
+                            onChange={(e) => handleChange('date', e.target.value)}
+                            error={errors.date}
+                        />
 
-                    <div>
-                        <label className="block text-gray-600 mb-1">감정</label>
-                            <input
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                                placeholder="😊, 😔 등"
-                                value={emotion}
-                                onChange={e => setEmotion(e.target.value)}
-                            />
-                    </div>
+                        <FormInput
+                            label="감정"
+                            type="text"
+                            name="emotion"
+                            value={formData.emotion}
+                            onChange={(e) => handleChange('emotion', e.target.value)}
+                            placeholder="😊, 😔 등"
+                        />
 
-                    <div>
-                        <label className="block text-gray-600 mb-1">내용</label>
+                        <div>
+                            <label className="block text-gray-700 mb-2">내용</label>
                             <textarea
-                                className="w-full p-3 border border-gray-300 rounded-lg h-40 resize-none focus:outline-none focus:ring-2 focus:ring-accent"
+                                className={`w-full p-4 border ${errors.content ? 'border-red-500' : 'border-gray-200'} rounded-lg h-48 resize-none focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-colors duration-200`}
                                 placeholder="오늘의 기록을 작성하세요..."
-                                value={content}
-                                onChange={e => setContent(e.target.value)}
+                                value={formData.content}
+                                onChange={(e) => handleChange('content', e.target.value)}
                             />
-                    </div>
+                            {errors.content && (
+                                <p className="mt-2 text-sm text-red-500">{errors.content}</p>
+                            )}
+                        </div>
 
-                    <button
-                        type="button"
-                        onClick={handleSubmit}
-                        className="mt-4 py-3 bg-accent text-gray-800 font-medium rounded-lg shadow hover:bg-opacity-90 transition mx-auto w-1/2"
-                    >
-                        저장하기
-                    </button>
-                </form>
+                        <div className="flex justify-end pt-4">
+                            <button
+                                type="submit"
+                                className="px-6 py-3 bg-primary-500 text-white font-medium rounded-lg shadow-sm hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 transition-colors duration-200"
+                            >
+                                저장하기
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     )
